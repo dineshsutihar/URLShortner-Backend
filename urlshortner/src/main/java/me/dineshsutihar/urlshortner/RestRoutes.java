@@ -15,12 +15,10 @@ class UrlRequest {
   private String url;
 }
 
-
 @RestController
 public class RestRoutes {
 
   private final Map<String, String> routes = new HashMap<>();
-
 
   @GetMapping("/")
   public String home() {
@@ -49,7 +47,7 @@ public class RestRoutes {
     return ResponseEntity.status(201).body(shortenedUrl);
   }
 
-  //Short Url link to Original Redirection
+  // Short Url link to Original Redirection
   @GetMapping("/{shortCode}")
   public ResponseEntity<String> expandUrl(@PathVariable String shortCode) {
 
@@ -60,17 +58,20 @@ public class RestRoutes {
     }
 
     return ResponseEntity.status(301)
-            .location(URI.create(originalUrl))
-            .build();
+        .location(URI.create(originalUrl))
+        .build();
 
   }
 
   @DeleteMapping("/{shortCode}")
-  public String getStats(@RequestParam String url) {
-    return "This is Delete Route";
+  public ResponseEntity<String> getStats(@RequestBody String url) {
+    String originalUrl = routes.get(url);
+    if (originalUrl == null) {
+      return ResponseEntity.status(404).build();
+    }
+    routes.remove(url);
+    return ResponseEntity.status(200).body("Deleted Successfully");
   }
-
-
 
   // Helper Methods
   private String getShortenedUrl(String originalUrl) {
