@@ -72,15 +72,4 @@ public class RestRoutes {
     routes.remove(url);
     return ResponseEntity.status(200).body("Deleted Successfully");
   }
-
-  // Helper Methods
-  private String getShortenedUrl(String originalUrl) {
-    for (Map.Entry<String, String> entry : routes.entrySet()) {
-      if (entry.getValue().equals(originalUrl)) {
-        return "http://short.url/" + entry.getKey();
-      }
-    }
-    return null;
-  }
-
 }
