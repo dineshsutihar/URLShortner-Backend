@@ -39,7 +39,7 @@ public class UserService {
     }
 
     public String login(LoginRequest loginRequest){
-        Optional<user> userOpt = userRepository.findByEmail(loginRequest.getEmail());
+        Optional<User> userOpt = userRepository.findByEmail(loginRequest.getEmail());
 
         if(userOpt.isEmpty() || !passwordEncoder.matches(loginRequest.getPassword(), userOpt.get().getPassword())){
             throw new RuntimeException("Invalid email or password.");
