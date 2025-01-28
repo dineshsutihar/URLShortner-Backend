@@ -21,13 +21,13 @@ public class ShortUrl {
     private String originalUrl;;
 
     @Column(nullable = false, unique = true)
-    private String shortUrl;
+    private String shortCode; //renamed because it will store shortcode only not the url
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
     private User user;
 
     private LocalDateTime createdAt;
-    private LocalDateTime expiresAt;
+    private LocalDateTime expiredAt ;
 
 }
