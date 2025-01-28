@@ -38,19 +38,17 @@ Anonymous (unauthenticated) users can also create public short links!
 
 ---
 
+
 ## 🗂️ API Endpoints
 
-| Method | Endpoint                     | Auth? | Description |
-|:------:|:-----------------------------|:-----:|:------------|
-| POST   | `/auth/register`              | ❌ | Register a new user |
-| POST   | `/auth/login`                 | ❌ | Login user, set JWT cookie |
-| GET    | `/auth/logout`                | ✅ | Logout user, clear session |
-| POST   | `/shorten`                    | ❌ | Public create short URL |
-| POST   | `/user/shorten`                | ✅ | Authenticated create short URL |
-| DELETE | `/user/url/{id}`               | ✅ | Delete specific short URL |
-| PUT    | `/user/url/{id}/expire`        | ✅ | Update expiry date for a short URL |
-| GET    | `/user/profile`                | ✅ | Get user profile + created URLs |
-| GET    | `/{shortCode}`                 | ❌ | Redirect to original URL |
+| Method | Endpoint                        | Auth?           | Description                                                     | Requires Data to Send                                 |
+|--------|----------------------------------|-----------------|-----------------------------------------------------------------|------------------------------------------------------|
+| POST   | `/api/url/public`                | No              | Create a public short URL.                                      | `originalUrl` (string)                               |
+| POST   | `/api/url/private`               | Yes             | Create a private short URL (authenticated user).                | `originalUrl` (string), `customShortCode` (optional)  |
+| DELETE | `/api/url/delete/{id}`           | Yes (Admin/User) | Delete a short URL by its ID.                                   | `id` (Long)                                           |
+| PUT    | `/api/url/change-expired/{id}`   | Yes (Admin/User) | Update the expiration time for a short URL.                    | `id` (Long), `newExpiration` (ISO 8601 date string)   |
+| GET    | `/api/url/expand/{shortCode}`    | No              | Expand a short URL to its original URL.                         | `shortCode` (string)                                 |
+| GET    | `/api/user/profile`              | Yes             | Get the profile details of the authenticated user.              | None (Authorization header with JWT required)        |
 
 ---
 
@@ -58,6 +56,8 @@ Anonymous (unauthenticated) users can also create public short links!
 
 ```
 src/main/java/me/dineshsutihar/urlshortener/
+├── config/
+│   ├── SecurityConfig.java
 ├── controller/
 │   ├── AuthController.java
 │   ├── UrlController.java
@@ -69,15 +69,25 @@ src/main/java/me/dineshsutihar/urlshortener/
 │   ├── UserRepository.java
 │   └── ShortUrlRepository.java
 ├── security/
-│   ├── JwtUtil.java
-│   ├── JwtFilter.java
-│   └── SecurityConfig.java
+│   ├── JwtAuthenticationFilter.java
+│   └── JwtTokenProvider.java
 ├── service/
 │   ├── AuthService.java
 │   ├── UrlService.java
 │   └── UserService.java
 └── UrlShortenerApplication.java
 ```
+
+---
+
+### Breakdown:
+
+1. **Controller (`UrlController.java` and `UserController.java`)**: Handles the HTTP routes for URL shortening, expanding, deletion, etc.
+2. **Model (`ShortUrl.java` and `User.java`)**: Defines the data structures for short URLs and users.
+3. **Repository (`ShortUrlRepository.java` and `UserRepository.java`)**: Interfaces for interacting with the PostgreSQL database to save and fetch URL and user data.
+4. **Security (`JwtTokenProvider.java`)**: Handles JWT token generation and validation for user authentication.
+5. **Service (`UserService.java`)**: Contains business logic related to user authentication and profile management.
+6. **Test (`/test` folder)**: will contain unit tests for various parts of the application.
 
 ---
 
@@ -95,6 +105,10 @@ cd URLShortner-Backend
 Edit `src/main/resources/application.properties`:
 
 ```properties
+#Default Basic Properties 
+spring.application.name=urlshortner
+server.port=3030
+
 # PostgreSQL Configuration - currently i am using NeonDb
 spring.datasource.url=jdbc:postgresql://your-db-url/<database-name>
 spring.datasource.username=<your-db-username>
