@@ -1,3 +1,13 @@
-.idea
-.vscode
-target
+# IDE folders
+.idea/
+.vscode/
+
+# Build directories
+target/
+
+# IntelliJ IDEA specific files
+*.iml
+out/
+
+# Spring Boot related
+/application.properties
