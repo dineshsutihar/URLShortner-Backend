@@ -8,6 +8,7 @@ import me.dineshsutihar.urlshortner.security.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,8 @@ public class UrlController {
     private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/public")
-    public String createPublicShortUrl(@RequestParam String originalUrl) {
+    public String createPublicShortUrl(@RequestBody String originalUrl) {
+
         String shortCode = generateShortCode();
         ShortUrl shortUrl = ShortUrl.builder()
                 .originalUrl(originalUrl)
@@ -35,7 +37,7 @@ public class UrlController {
                 .build();
 
         shortUrlRepository.save(shortUrl);
-        return "Short URL created: /" + shortCode;
+        return shortCode;
     }
 
     @PostMapping("/private")
@@ -83,7 +85,7 @@ public class UrlController {
         }
     }
 
-    @GetMapping("/expand/{shortCode}")
+    @GetMapping("/public/{shortCode}")
     public String expandUrl(@PathVariable String shortCode) {
         Optional<ShortUrl> shortUrl = shortUrlRepository.findByShortCode(shortCode);
 

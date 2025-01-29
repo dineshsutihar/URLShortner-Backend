@@ -41,14 +41,14 @@ Anonymous (unauthenticated) users can also create public short links!
 
 ## 🗂️ API Endpoints
 
-| Method | Endpoint                        | Auth?           | Description                                                     | Requires Data to Send                                 |
-|--------|----------------------------------|-----------------|-----------------------------------------------------------------|------------------------------------------------------|
-| POST   | `/api/url/public`                | No              | Create a public short URL.                                      | `originalUrl` (string)                               |
-| POST   | `/api/url/private`               | Yes             | Create a private short URL (authenticated user).                | `originalUrl` (string), `customShortCode` (optional)  |
-| DELETE | `/api/url/delete/{id}`           | Yes (Admin/User) | Delete a short URL by its ID.                                   | `id` (Long)                                           |
-| PUT    | `/api/url/change-expired/{id}`   | Yes (Admin/User) | Update the expiration time for a short URL.                    | `id` (Long), `newExpiration` (ISO 8601 date string)   |
-| GET    | `/api/url/expand/{shortCode}`    | No              | Expand a short URL to its original URL.                         | `shortCode` (string)                                 |
-| GET    | `/api/user/profile`              | Yes             | Get the profile details of the authenticated user.              | None (Authorization header with JWT required)        |
+| Method | Endpoint                       | Auth?           | Description                                                     | Requires Data to Send                                 |
+|--------|--------------------------------|-----------------|-----------------------------------------------------------------|------------------------------------------------------|
+| POST   | `/api/url/public`              | No              | Create a public short URL.                                      | `originalUrl` (string)                               |
+| POST   | `/api/url/private`             | Yes             | Create a private short URL (authenticated user).                | `originalUrl` (string), `customShortCode` (optional)  |
+| DELETE | `/api/url/delete/{id}`         | Yes (Admin/User) | Delete a short URL by its ID.                                   | `id` (Long)                                           |
+| PUT    | `/api/url/change-expired/{id}` | Yes (Admin/User) | Update the expiration time for a short URL.                    | `id` (Long), `newExpiration` (ISO 8601 date string)   |
+| GET    | `/api/url/public/{shortCode}`  | No              | Expand a short URL to its original URL.                         | `shortCode` (string)                                 |
+| GET    | `/api/user/profile`            | Yes             | Get the profile details of the authenticated user.              | None (Authorization header with JWT required)        |
 
 ---
 
