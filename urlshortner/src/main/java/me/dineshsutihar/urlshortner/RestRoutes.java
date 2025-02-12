@@ -26,6 +26,7 @@ public class RestRoutes {
   }
 
   // Accept Long Url and shortened it
+  @CrossOrigin(origins = "http://localhost:5173/")
   @PostMapping("/shorten")
   public ResponseEntity<String> shortenUrl(@RequestBody UrlRequest urlRequest) {
     System.out.println(urlRequest);
