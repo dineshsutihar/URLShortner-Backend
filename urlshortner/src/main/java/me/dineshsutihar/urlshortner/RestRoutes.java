@@ -22,11 +22,10 @@ public class RestRoutes {
 
   @GetMapping("/")
   public String home() {
-    return "Welcome to URL Shortner";
+    return "Welcome to URL Shortener";
   }
 
-  // Accept Long Url and shortened it
-  @CrossOrigin(origins = "http://localhost:5173/")
+  // Accept Long URL and shorten it
   @PostMapping("/shorten")
   public ResponseEntity<String> shortenUrl(@RequestBody UrlRequest urlRequest) {
     System.out.println(urlRequest);
@@ -34,7 +33,7 @@ public class RestRoutes {
     System.out.println(originalUrl);
 
     if (originalUrl == null || originalUrl.isEmpty()) {
-      return ResponseEntity.status(204).body("Error: URL cannot be empty");
+      return ResponseEntity.status(400).body("Error: URL cannot be empty");
     }
 
     if (routes.containsValue(originalUrl)) {
@@ -42,35 +41,30 @@ public class RestRoutes {
     }
 
     String shortenedUrl = generateRandomString(originalUrl);
-
     routes.put(shortenedUrl, originalUrl);
 
     return ResponseEntity.status(201).body(shortenedUrl);
   }
 
-  // Short Url link to Original Redirection
+  // Short URL redirect to Original URL
   @GetMapping("/{shortCode}")
-  public ResponseEntity<String> expandUrl(@PathVariable String shortCode) {
-
+  public ResponseEntity<Void> expandUrl(@PathVariable String shortCode) {
     String originalUrl = routes.get(shortCode);
 
     if (originalUrl == null) {
       return ResponseEntity.status(404).build();
     }
 
-    return ResponseEntity.status(301)
-        .location(URI.create(originalUrl))
-        .build();
-
+    return ResponseEntity.status(301).location(URI.create(originalUrl)).build();
   }
 
+  // Delete Short URL
   @DeleteMapping("/{shortCode}")
-  public ResponseEntity<String> getStats(@RequestBody String url) {
-    String originalUrl = routes.get(url);
-    if (originalUrl == null) {
-      return ResponseEntity.status(404).build();
+  public ResponseEntity<String> deleteUrl(@PathVariable String shortCode) {
+    if (!routes.containsKey(shortCode)) {
+      return ResponseEntity.status(404).body("Short URL not found");
     }
-    routes.remove(url);
+    routes.remove(shortCode);
     return ResponseEntity.status(200).body("Deleted Successfully");
   }
 }
