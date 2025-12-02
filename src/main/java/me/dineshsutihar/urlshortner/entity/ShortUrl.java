@@ -17,17 +17,21 @@ public class ShortUrl {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String originalUrl;;
+    @Column(nullable = false, length = 2048)
+    private String originalUrl;
 
     @Column(nullable = false, unique = true)
-    private String shortCode; //renamed because it will store shortcode only not the url
+    private String shortCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
     private LocalDateTime createdAt;
-    private LocalDateTime expiredAt ;
+    private LocalDateTime expiredAt;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Long clickCount = 0L;
 
 }
