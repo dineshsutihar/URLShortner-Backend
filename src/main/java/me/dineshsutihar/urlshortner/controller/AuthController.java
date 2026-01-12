@@ -1,39 +1,39 @@
 package me.dineshsutihar.urlshortner.controller;
 
-import me.dineshsutihar.urlshortner.entity.User;
-import me.dineshsutihar.urlshortner.repository.UserRepository;
-import me.dineshsutihar.urlshortner.security.JwtTokenProvider;
+import me.dineshsutihar.urlshortner.dto.LoginRequest;
+import me.dineshsutihar.urlshortner.dto.RegisterRequest;
+import me.dineshsutihar.urlshortner.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final AuthService authService;
 
     @PostMapping("/register")
-    public String register(@RequestBody @Valid User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
-        return "User registered successfully.";
+    public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest request) {
+        try {
+            String message = authService.register(request);
+            return ResponseEntity.ok(Map.of("message", message));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody User user) {
-        Optional<User> optionalUser = userRepository.findByEmail(user.getEmail());
-
-        if (optionalUser.isPresent() && passwordEncoder.matches(user.getPassword(), optionalUser.get().getPassword())) {
-            return jwtTokenProvider.createToken(user.getEmail());
-        } else {
-            throw new RuntimeException("Invalid credentials");
+    public ResponseEntity<?> login(@RequestBody @Valid LoginRequest request) {
+        try {
+            String token = authService.login(request);
+            return ResponseEntity.ok(Map.of("token", token));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
         }
     }
 }
